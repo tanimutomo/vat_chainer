@@ -83,12 +83,14 @@ def train(args):
     ul_losses = np.zeros(args.num_epochs)
     mkdir_p(args.log_dir)
     for epoch in range(args.num_epochs):
+        print('epoch:', epoch)
         optimizer.alpha = alpha_plan[epoch]
         optimizer.beta1 = beta1_plan[epoch]
         sum_loss_l = 0
         sum_loss_ul = 0
         start = time.time()
         for it in range(args.num_iter_per_epoch):
+            print('  iter:', it)
             x, t = train_l.get(args.batchsize, gpu=args.gpu, aug_trans=args.aug_trans, aug_flip=args.aug_flip)
             loss_l = loss_labeled(enc, Variable(x), Variable(t))
             x_u, _ = train_ul.get(args.batchsize_ul, gpu=args.gpu, aug_trans=args.aug_trans, aug_flip=args.aug_flip)

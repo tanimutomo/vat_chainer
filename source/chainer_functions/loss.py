@@ -1,3 +1,4 @@
+import numpy as np
 import chainer
 import chainer.functions as F
 from chainer import FunctionSet, Variable, optimizers, cuda, serializers
@@ -48,8 +49,10 @@ def entropy_y_x(p_logit):
 
 
 def get_normalized_vector(d, xp):
-    d /= (1e-12 + xp.max(xp.abs(d), range(1, len(d.shape)), keepdims=True))
-    d /= xp.sqrt(1e-6 + xp.sum(d ** 2, range(1, len(d.shape)), keepdims=True))
+    # d /= (1e-12 + xp.max(xp.abs(d), range(1, len(d.shape)), keepdims=True))
+    d /= (1e-12 + xp.max(xp.abs(d), tuple(np.arange(1, len(d.shape)).tolist()), keepdims=True))
+    # d /= xp.sqrt(1e-6 + xp.sum(d ** 2, range(1, len(d.shape)), keepdims=True))
+    d /= xp.sqrt(1e-6 + xp.sum(d ** 2, tuple(np.arange(1, len(d.shape)).tolist()), keepdims=True))
     return d
 
 
@@ -78,7 +81,7 @@ def vat_loss(forward, distance, x, train=True, epsilon=8.0, xi=1e-6, Ip=1, p_log
         kl_loss = distance(p_logit, p_d_logit)
         kl_loss.backward()
         d = x_d.grad
-        d = d / xp.sqrt(xp.sum(d ** 2, axis=range(1, len(d.shape)), keepdims=True))
+        d = d / xp.sqrt(xp.sum(d ** 2, axis=tuple(np.arange(1, len(d.shape)).tolist()), keepdims=True))
     x_adv = x + epsilon * d 
     p_adv_logit = forward(x_adv, train=train, update_batch_stats=False)
     return distance(p_logit, p_adv_logit)
