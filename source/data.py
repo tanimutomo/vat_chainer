@@ -1,7 +1,6 @@
 import pickle
 import datetime, math, sys, time
 
-from sklearn.datasets import fetch_mldata
 import numpy as np
 import math
 import chainer
